@@ -16,7 +16,7 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
         List<Vehicle> vehicles = vehicleService.getAllVehicles();
         return new ResponseEntity<>(vehicles, HttpStatus.OK);

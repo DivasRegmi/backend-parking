@@ -12,7 +12,7 @@ import java.util.Optional;
 public class VehicleService {
 
     @Autowired
-    private VehicleRepository vehicleRepository;
+    private VehicleRepository vehicleRepository ;
 
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
