@@ -10,29 +10,23 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-
-    private final UserRepository userRepository;
-
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserRepository userRepository;
 
-    public Optional<User> getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    public Optional<User> getUserById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
     public User saveUser(User user) {
-        // You can add additional business logic/validation here if needed
         return userRepository.save(user);
     }
 
     public void deleteUser(Long userId) {
-        // You can add additional business logic/validation here if needed
         userRepository.deleteById(userId);
     }
 }
