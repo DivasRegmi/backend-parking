@@ -1,5 +1,6 @@
 package com.project.carparking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,11 +15,16 @@ public class Vehicle {
     private Long id;
 
     private String numberPlate;
+
     private String model;
-    private String parkingSlot;
+
+    @OneToOne(mappedBy = "vehicle", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private ParkingSlot parkingSlot;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
 }

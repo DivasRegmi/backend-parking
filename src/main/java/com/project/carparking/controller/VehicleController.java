@@ -1,7 +1,10 @@
 package com.project.carparking.controller;
 
+import com.project.carparking.config.AppConstants;
+import com.project.carparking.dto.WithPaginationResponse;
 import com.project.carparking.entity.Vehicle;
 import com.project.carparking.service.VehicleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,43 +19,32 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Vehicle>> getAllVehicles() {
-        List<Vehicle> vehicles = vehicleService.getAllVehicles();
-        return new ResponseEntity<>(vehicles, HttpStatus.OK);
+    @GetMapping()
+    public ResponseEntity<WithPaginationResponse<Vehicle>> fetchVehicleList(@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+                                                                            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize) {
+
+        return ResponseEntity.ok(vehicleService.findAll(pageNo, pageSize));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
-        return vehicleService.getVehicleById(id)
-                .map(vehicle -> new ResponseEntity<>(vehicle, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long vehicleId) {
+        return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
 
-    @GetMapping("/byNumberPlate/{numberPlate}")
-    public ResponseEntity<Vehicle> getVehicleByNumberPlate(@PathVariable String numberPlate) {
-        return vehicleService.getVehicleByNumberPlate(numberPlate)
-                .map(vehicle -> new ResponseEntity<>(vehicle, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    @PostMapping("/users/{userId}")
+    public Vehicle createVehicle(@PathVariable Long userId ,@Valid @RequestBody Vehicle vehicle) {
+        return vehicleService.saveVehicle(userId,vehicle);
     }
 
-    @PostMapping
-    public ResponseEntity<Vehicle> saveVehicle(@RequestBody Vehicle vehicle) {
-        Vehicle savedVehicle = vehicleService.saveVehicle(vehicle);
-        return new ResponseEntity<>(savedVehicle, HttpStatus.CREATED);
+    @PatchMapping("/{vehicleId}")
+    public ResponseEntity<Vehicle> updateVehicleDetails(@PathVariable Long vehicleId,@Valid @RequestBody Vehicle updatedVehicle) {
+        Vehicle updatedVehicleData = vehicleService.updateVehicleDetails(vehicleId, updatedVehicle);
+
+        return new ResponseEntity<>(updatedVehicleData, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody Vehicle updatedVehicle) {
-        Vehicle updated = vehicleService.updateVehicle(id, updatedVehicle);
-        return updated != null ?
-                new ResponseEntity<>(updated, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
-        vehicleService.deleteVehicle(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @DeleteMapping("/{vehicleId}")
+    public void deleteVehicle(@PathVariable Long vehicleId) {
+        vehicleService.deleteVehicle(vehicleId);
     }
 }
