@@ -5,9 +5,11 @@ import com.project.carparking.dto.UserResponse;
 import com.project.carparking.dto.WithPaginationResponse;
 import com.project.carparking.dto.converter.Converter;
 import com.project.carparking.entity.EnumRole;
+import com.project.carparking.entity.ParkingSlot;
 import com.project.carparking.entity.User;
 import com.project.carparking.entity.Vehicle;
 import com.project.carparking.exception.ResourceNotFoundException;
+import com.project.carparking.repository.ParkingSlotRepository;
 import com.project.carparking.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,9 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ParkingSlotRepository parkingSlotRepository;
 
 
     public WithPaginationResponse<UserResponse> findAll(int pageNo, int pageSize) {
@@ -84,8 +89,10 @@ public class UserService {
                 }
             }
             case "parking_slot" -> {
-                List<User> byVehicleNumber = userRepository.findByParkingSlot(query);
-                for (User user : byVehicleNumber) {
+                List<ParkingSlot> bySlotNumber = parkingSlotRepository.findBySlotNumber(query);
+
+                for (ParkingSlot parkingSlot : bySlotNumber) {
+                    User user = parkingSlot.getUser();
                     UserResponse userResponse = Converter.convertToUserResponse(user);
                     userResponseList.add(userResponse);
                 }
