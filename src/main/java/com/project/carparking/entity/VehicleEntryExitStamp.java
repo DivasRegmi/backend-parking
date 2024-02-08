@@ -23,6 +23,9 @@ public class VehicleEntryExitStamp {
     @Column(name = "exit_time")
     private LocalDateTime exitTime;
 
+
+    private int countFalseSlotStatus;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;

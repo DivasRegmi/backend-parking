@@ -5,9 +5,11 @@ import com.project.carparking.dto.converter.Converter;
 import com.project.carparking.entity.ParkingSlot;
 import com.project.carparking.entity.User;
 import com.project.carparking.entity.Vehicle;
+import com.project.carparking.entity.VehicleEntryExitStamp;
 import com.project.carparking.exception.ResourceNotFoundException;
 import com.project.carparking.repository.ParkingSlotRepository;
 import com.project.carparking.repository.UserRepository;
+import com.project.carparking.repository.VehicleEntryExitStampRepository;
 import com.project.carparking.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +29,9 @@ public class VehicleService {
     private VehicleRepository vehicleRepository;
     @Autowired
     private ParkingSlotRepository parkingSlotRepository;
+
+    @Autowired
+    private VehicleEntryExitStampRepository vehicleEntryExitStampRepository;
 
     public WithPaginationResponse<Vehicle> findAll(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -72,7 +78,6 @@ public class VehicleService {
         // Save the vehicle
         return savedVehicle;
     }
-
 
 
     public Vehicle updateVehicleDetails(Long vehicleId, Vehicle vehicleRequest) {
@@ -124,11 +129,35 @@ public class VehicleService {
         }
     }
 
+    //11 -> true false
     public void updateParkingSlotStatus(String slotNumber, boolean slotStatus) {
         ParkingSlot parkingSlot = parkingSlotRepository.findBySlotNumber(slotNumber).orElseThrow(() -> {
             return new ResourceNotFoundException("Parking Slot " + slotNumber + " not found");
-        });;
+        });
+
         parkingSlot.setSlotStatus(slotStatus);
         parkingSlotRepository.save(parkingSlot);
+
+        VehicleEntryExitStamp lastStamp = vehicleEntryExitStampRepository.findFirstByOrderByEntryTimeDesc().orElseThrow(() -> {
+            return new ResourceNotFoundException("VehicleEntryExitStamp not found");
+        });
+
+        if (slotStatus && lastStamp.getExitTime() != null) {
+            //11 -> true  after 5 min 11-> true
+            LocalDateTime currentTime = LocalDateTime.now();
+            VehicleEntryExitStamp vehicleEntryExitStamp = new VehicleEntryExitStamp();
+            vehicleEntryExitStamp.setCountFalseSlotStatus(0);
+            vehicleEntryExitStamp.setEntryTime(currentTime);
+
+            vehicleEntryExitStampRepository.save(vehicleEntryExitStamp);
+        } else if (!slotStatus && lastStamp.getCountFalseSlotStatus() < 1) {
+
+            lastStamp.setCountFalseSlotStatus(lastStamp.getCountFalseSlotStatus() + 1);
+        } else if (!slotStatus && lastStamp.getCountFalseSlotStatus() == 1) {
+            LocalDateTime currentTime = LocalDateTime.now();
+            lastStamp.setExitTime(currentTime);
+            lastStamp.setCountFalseSlotStatus(lastStamp.getCountFalseSlotStatus() + 1);
+
+        }
     }
 }

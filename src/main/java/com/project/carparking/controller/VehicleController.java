@@ -56,8 +56,6 @@ public class VehicleController {
 
 
         vehicleService.updateParkingSlotStatus(slotNumber, slotStatus);
-
-        // You may want to return the updated vehicle data or simply a success message
         return new ResponseEntity<>("Done", HttpStatus.OK);
     }
 

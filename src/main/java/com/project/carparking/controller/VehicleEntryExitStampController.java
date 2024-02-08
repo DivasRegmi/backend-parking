@@ -44,6 +44,12 @@ public class VehicleEntryExitStampController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStamp);
     }
 
+    @PostMapping("/parking-slot/{slotNumber}")
+    public ResponseEntity<VehicleEntryExitStamp> createVehicleEntryExitStampBySlotNumber(@PathVariable String slotNumber, @Valid @RequestBody VehicleEntryExitStamp vehicleEntryExitStamp) {
+        VehicleEntryExitStamp createdStamp = vehicleEntryExitStampService.saveVehicleEntryExitStampBySlotNumber(slotNumber, vehicleEntryExitStamp);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdStamp);
+    }
+
 
     @PutMapping("/{stampId}")
     public ResponseEntity<VehicleEntryExitStamp> updateVehicleEntryExitStamp(@PathVariable Long stampId, @Valid @RequestBody VehicleEntryExitStamp updatedStamp) {
