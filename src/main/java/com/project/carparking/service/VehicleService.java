@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class VehicleService {
 
@@ -45,6 +47,11 @@ public class VehicleService {
 
 
         return vehicle;
+    }
+
+    public List<Vehicle> getVehicleByUserId(Long userId) {
+
+        return vehicleRepository.findByUserId(userId);
     }
 
     public Vehicle saveVehicle(Long userId, Vehicle vehicle) {

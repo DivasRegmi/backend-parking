@@ -30,6 +30,10 @@ public class VehicleController {
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<List<Vehicle>> getVehicleByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(vehicleService.getVehicleByUserId(userId));
+    }
 
     @PostMapping("/users/{userId}")
     public Vehicle createVehicle(@PathVariable Long userId ,@Valid @RequestBody Vehicle vehicle) {
