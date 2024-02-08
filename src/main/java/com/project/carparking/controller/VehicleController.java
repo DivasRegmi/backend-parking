@@ -30,21 +30,35 @@ public class VehicleController {
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));
     }
+
     @GetMapping("/users/{userId}")
     public ResponseEntity<List<Vehicle>> getVehicleByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(vehicleService.getVehicleByUserId(userId));
     }
 
     @PostMapping("/users/{userId}")
-    public Vehicle createVehicle(@PathVariable Long userId ,@Valid @RequestBody Vehicle vehicle) {
-        return vehicleService.saveVehicle(userId,vehicle);
+    public Vehicle createVehicle(@PathVariable Long userId, @Valid @RequestBody Vehicle vehicle) {
+        return vehicleService.saveVehicle(userId, vehicle);
     }
 
     @PatchMapping("/{vehicleId}")
-    public ResponseEntity<Vehicle> updateVehicleDetails(@PathVariable Long vehicleId,@Valid @RequestBody Vehicle updatedVehicle) {
+    public ResponseEntity<Vehicle> updateVehicleDetails(@PathVariable Long vehicleId, @Valid @RequestBody Vehicle updatedVehicle) {
         Vehicle updatedVehicleData = vehicleService.updateVehicleDetails(vehicleId, updatedVehicle);
 
         return new ResponseEntity<>(updatedVehicleData, HttpStatus.OK);
+    }
+
+    @PatchMapping("/parking-slot-status/{slotNumber}")
+    public ResponseEntity<String> updateParkingSlotStatus(
+            @PathVariable String slotNumber,
+            @RequestParam(defaultValue = "false") boolean slotStatus
+    ) {
+
+
+        vehicleService.updateParkingSlotStatus(slotNumber, slotStatus);
+
+        // You may want to return the updated vehicle data or simply a success message
+        return new ResponseEntity<>("Done", HttpStatus.OK);
     }
 
     @DeleteMapping("/{vehicleId}")

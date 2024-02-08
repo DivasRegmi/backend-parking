@@ -17,12 +17,9 @@ public class ParkingSlot {
 
     private boolean slotStatus;
 
+    @Column(unique = true)
     private String slotNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnore
-    private User user;
 
     @OneToOne
     @JoinColumn(name = "vehicle_id")

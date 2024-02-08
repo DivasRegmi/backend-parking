@@ -65,7 +65,6 @@ public class VehicleService {
 
         if (vehicle.getParkingSlot() != null) {
             ParkingSlot parkingSlot = vehicle.getParkingSlot();
-            parkingSlot.setUser(user);
             parkingSlot.setVehicle(savedVehicle);
             parkingSlotRepository.save(parkingSlot);
         }
@@ -102,7 +101,7 @@ public class VehicleService {
                 parkingSlotRepository.save(existingParkingSlot);
             } else {
 
-                parkingSlot.setUser(existingVehicle.getUser());
+
                 parkingSlot.setVehicle(existingVehicle);
                 parkingSlotRepository.save(parkingSlot);
 
@@ -123,5 +122,13 @@ public class VehicleService {
         } else {
             throw new ResourceNotFoundException("Vehicle " + vehicleId + " not found");
         }
+    }
+
+    public void updateParkingSlotStatus(String slotNumber, boolean slotStatus) {
+        ParkingSlot parkingSlot = parkingSlotRepository.findBySlotNumber(slotNumber).orElseThrow(() -> {
+            return new ResourceNotFoundException("Parking Slot " + slotNumber + " not found");
+        });;
+        parkingSlot.setSlotStatus(slotStatus);
+        parkingSlotRepository.save(parkingSlot);
     }
 }

@@ -89,13 +89,15 @@ public class UserService {
                 }
             }
             case "parking_slot" -> {
-                List<ParkingSlot> bySlotNumber = parkingSlotRepository.findBySlotNumber(query);
+                ParkingSlot parkingSlot = parkingSlotRepository.findBySlotNumber(query).orElseThrow(() -> {
+                    return new ResourceNotFoundException("Parking Slot " + query + " not found");
+                });
 
-                for (ParkingSlot parkingSlot : bySlotNumber) {
-                    User user = parkingSlot.getUser();
+
+                    User user = parkingSlot.getVehicle().getUser();
                     UserResponse userResponse = Converter.convertToUserResponse(user);
                     userResponseList.add(userResponse);
-                }
+
             }
             default ->
                 // Handle invalid searchBy parameter
