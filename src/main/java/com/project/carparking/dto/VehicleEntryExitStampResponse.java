@@ -9,7 +9,7 @@ import java.time.LocalTime;
 @Data
 public class VehicleEntryExitStampResponse {
     private LocalDate entryDate;
-    private LocalTime entryTime;
+    private String entryTime;
     private Double  totalHoursParked;
 
 }

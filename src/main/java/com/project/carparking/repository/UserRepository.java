@@ -11,8 +11,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT u.pushNotificationToken FROM User u WHERE u.pushNotificationToken IS NOT NULL AND u.pushNotificationToken <> ''")
-    List<String> findAllUsersPushNotificationTokens();
+
     Optional<User> findByPhoneNo(String phoneNo);
     Optional<User> findByPhoneNoContaining(String phoneNo);
     List<User> findByNameContaining(String name);
@@ -21,6 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT DISTINCT u FROM User u JOIN u.vehicles v WHERE v.numberPlate LIKE %:numberPlate%")
     List<User> findByVehicleNumberPlateContaining(@Param("numberPlate") String numberPlate);
+
+    Optional<User> findFirstByRoleOrderByCreatedAtAsc(EnumRole role);
 
 
 }

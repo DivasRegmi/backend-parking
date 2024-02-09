@@ -58,10 +58,6 @@ public class User implements UserDetails {
     private EnumRole role;
 
 
-    @Column(name = "push_notification_token")
-    private String pushNotificationToken;
-
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vehicle> vehicles = new ArrayList<>();
 

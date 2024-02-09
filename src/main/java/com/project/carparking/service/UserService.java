@@ -35,6 +35,9 @@ public class UserService {
     @Autowired
     private ParkingSlotRepository parkingSlotRepository;
 
+    @Autowired
+    private PushNotificationService pushNotificationService;
+
 
     public WithPaginationResponse<UserResponse> findAll(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
@@ -115,8 +118,12 @@ public class UserService {
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     public User saveUser(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setRole(EnumRole.USER);
         user.setPassword(encodedPassword);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        pushNotificationService.sendOnboardingNotification(savedUser.getId());
+        return savedUser;
     }
 
     public UserRequest updateUserDetails(Long userId, UserRequest userRequest) {
@@ -136,9 +143,6 @@ public class UserService {
             existingUser.setPhoneNo(userRequest.getPhoneNo());
         }
 
-        if (userRequest.getRole() != null && existingUser.getRole() == EnumRole.ADMIN) {
-            existingUser.setRole(userRequest.getRole());
-        }
 
         userRepository.save(existingUser);
         return userRequest;

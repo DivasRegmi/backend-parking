@@ -56,7 +56,7 @@ public class AuthenticationService {
         List<User> adminUsers = repository.findByRole(EnumRole.ADMIN);
 
         if (!adminUsers.isEmpty()) {
-            throw new IllegalStateException("Admin user already exists");
+            throw new ResourceAlreadyExistException("Admin user already exists");
         }
 
         var user = User.builder()

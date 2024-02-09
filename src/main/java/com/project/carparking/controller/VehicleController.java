@@ -63,4 +63,9 @@ public class VehicleController {
     public void deleteVehicle(@PathVariable Long vehicleId) {
         vehicleService.deleteVehicle(vehicleId);
     }
+
+    @GetMapping("/number-plates")
+    public String[] getAllNumberPlates() {
+        return vehicleService.getAllNumberPlates();
+    }
 }

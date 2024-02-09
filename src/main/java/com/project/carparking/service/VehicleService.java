@@ -6,6 +6,7 @@ import com.project.carparking.entity.ParkingSlot;
 import com.project.carparking.entity.User;
 import com.project.carparking.entity.Vehicle;
 import com.project.carparking.entity.VehicleEntryExitStamp;
+import com.project.carparking.exception.ResourceCanNotCreateException;
 import com.project.carparking.exception.ResourceNotFoundException;
 import com.project.carparking.repository.ParkingSlotRepository;
 import com.project.carparking.repository.UserRepository;
@@ -16,9 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VehicleService {
@@ -60,7 +63,18 @@ public class VehicleService {
         return vehicleRepository.findByUserId(userId);
     }
 
+    @Transactional
     public Vehicle saveVehicle(Long userId, Vehicle vehicle) {
+
+        if (vehicle.getParkingSlot().getSlotNumber() != null) {
+            ParkingSlot parkingSlot = vehicle.getParkingSlot();
+            Optional<ParkingSlot> bySlotNumber = parkingSlotRepository.findBySlotNumber(parkingSlot.getSlotNumber());
+
+            if (bySlotNumber.isPresent()) {
+                throw new ResourceCanNotCreateException("Parking Slot already allocated. Choose a new one.");
+            }
+        }
+
         // Find the user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -71,8 +85,10 @@ public class VehicleService {
 
         if (vehicle.getParkingSlot() != null) {
             ParkingSlot parkingSlot = vehicle.getParkingSlot();
+
             parkingSlot.setVehicle(savedVehicle);
             parkingSlotRepository.save(parkingSlot);
+
         }
 
         // Save the vehicle
@@ -81,6 +97,15 @@ public class VehicleService {
 
 
     public Vehicle updateVehicleDetails(Long vehicleId, Vehicle vehicleRequest) {
+        if (vehicleRequest.getParkingSlot().getSlotNumber() != null) {
+            ParkingSlot parkingSlot = vehicleRequest.getParkingSlot();
+            Optional<ParkingSlot> bySlotNumber = parkingSlotRepository.findBySlotNumber(parkingSlot.getSlotNumber());
+
+            if (bySlotNumber.isPresent()) {
+                throw new ResourceCanNotCreateException("Parking Slot already allocated. Choose a new one.");
+            }
+        }
+
         Vehicle existingVehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle " + vehicleId + " not found"));
 
@@ -138,6 +163,8 @@ public class VehicleService {
         parkingSlot.setSlotStatus(slotStatus);
         parkingSlotRepository.save(parkingSlot);
 
+        Vehicle vehicle = parkingSlot.getVehicle();
+
         VehicleEntryExitStamp lastStamp = vehicleEntryExitStampRepository.findFirstByOrderByEntryTimeDesc().orElseThrow(() -> {
             return new ResourceNotFoundException("VehicleEntryExitStamp not found");
         });
@@ -148,16 +175,23 @@ public class VehicleService {
             VehicleEntryExitStamp vehicleEntryExitStamp = new VehicleEntryExitStamp();
             vehicleEntryExitStamp.setCountFalseSlotStatus(0);
             vehicleEntryExitStamp.setEntryTime(currentTime);
+            vehicleEntryExitStamp.setVehicle(vehicle);
 
             vehicleEntryExitStampRepository.save(vehicleEntryExitStamp);
         } else if (!slotStatus && lastStamp.getCountFalseSlotStatus() < 1) {
-
             lastStamp.setCountFalseSlotStatus(lastStamp.getCountFalseSlotStatus() + 1);
+            vehicleEntryExitStampRepository.save(lastStamp);
+
         } else if (!slotStatus && lastStamp.getCountFalseSlotStatus() == 1) {
             LocalDateTime currentTime = LocalDateTime.now();
-            lastStamp.setExitTime(currentTime);
+            LocalDateTime fiveMinutesAgo = currentTime.minusMinutes(5);
+            lastStamp.setExitTime(fiveMinutesAgo);
             lastStamp.setCountFalseSlotStatus(lastStamp.getCountFalseSlotStatus() + 1);
-
+            vehicleEntryExitStampRepository.save(lastStamp);
         }
+    }
+
+    public String[] getAllNumberPlates() {
+        return vehicleRepository.findAllNumberPlates();
     }
 }

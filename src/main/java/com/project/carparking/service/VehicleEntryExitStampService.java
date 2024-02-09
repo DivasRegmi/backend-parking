@@ -112,23 +112,7 @@ public class VehicleEntryExitStampService {
 
     }
 
-//    public VehicleEntryExitStamp updateVehicleEntryExitStamp(Long stampId, VehicleEntryExitStamp updatedStamp) {
-//        // Check if the stampId is valid
-//        VehicleEntryExitStamp existingStamp = getVehicleEntryExitStampById(stampId);
-//
-//
-//        // Update existing stamp fields with fields from updatedStamp
-//        if (updatedStamp.getEntryTime() != null) {
-//            existingStamp.setEntryTime(updatedStamp.getEntryTime());
-//        }
-//        if (updatedStamp.getExitTime() != null) {
-//            existingStamp.setExitTime(updatedStamp.getExitTime());
-//        }
-//
-//        // Save the updated stamp
-//        return vehicleEntryExitStampRepository.save(existingStamp);
-//
-//    }
+
 
 
     public void deleteVehicleEntryExitStamp(Long stampId) {

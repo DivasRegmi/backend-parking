@@ -17,7 +17,7 @@ public class ParkingSlot {
 
     private boolean slotStatus;
 
-    @Column(unique = true)
+
     private String slotNumber;
 
 
