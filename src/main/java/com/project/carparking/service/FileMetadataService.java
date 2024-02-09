@@ -45,7 +45,7 @@ public class FileMetadataService {
     }
 
     public List<String> getAllImageUrls() {
-        List<FileMetadata> files = fileMetadataRepository.findAll();
+        List<FileMetadata> files = fileMetadataRepository.findAllByOrderByCreatedAtDesc();
         return files.stream()
                 .map(file -> ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/api/images/")

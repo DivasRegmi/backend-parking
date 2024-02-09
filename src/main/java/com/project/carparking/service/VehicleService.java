@@ -148,6 +148,7 @@ public class VehicleService {
                 pushNotificationService.sendParkingSpaceAllocatedNotification(userId, parkingSlot.getSlotNumber());
 
             }
+
         }
 
         // Save the updated vehicle
