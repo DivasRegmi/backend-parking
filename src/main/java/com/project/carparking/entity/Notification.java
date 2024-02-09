@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -20,7 +21,10 @@ public class Notification {
 
 
     private String title;
+
     private String subtitle;
+
+    @CreationTimestamp
     private LocalDateTime date;
 
     @ManyToOne

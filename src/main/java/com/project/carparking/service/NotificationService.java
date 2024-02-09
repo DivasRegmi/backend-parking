@@ -30,7 +30,7 @@ public class NotificationService {
 
     // Method to fetch notifications by userId
     public List<NotificationResponse> getNotificationsByUserId(Long userId) {
-        List<Notification> notifications = notificationRepository.findByUserId(userId);
+        List<Notification> notifications = notificationRepository.findByUserIdOrderByDateDesc(userId);
         return convertToResponseList(notifications);
     }
 

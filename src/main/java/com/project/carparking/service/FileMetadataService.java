@@ -2,6 +2,7 @@ package com.project.carparking.service;
 
 import com.project.carparking.entity.FileMetadata;
 import com.project.carparking.repository.FileMetadataRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,5 +77,15 @@ public class FileMetadataService {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    @Transactional
+    public void deleteImagesOlderThanOneMonth() {
+        // Calculate the date one month ago
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+
+        // Delete entries older than one month
+        fileMetadataRepository.deleteByCreatedAtBefore(oneMonthAgo);
     }
 }

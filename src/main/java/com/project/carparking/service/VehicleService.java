@@ -69,7 +69,7 @@ public class VehicleService {
     @Transactional
     public Vehicle saveVehicle(Long userId, Vehicle vehicle) {
 
-        if (vehicle.getParkingSlot().getSlotNumber() != null) {
+        if (vehicle.getParkingSlot() != null && vehicle.getParkingSlot().getSlotNumber() != null) {
             ParkingSlot parkingSlot = vehicle.getParkingSlot();
             Optional<ParkingSlot> bySlotNumber = parkingSlotRepository.findBySlotNumber(parkingSlot.getSlotNumber());
 
@@ -116,6 +116,7 @@ public class VehicleService {
 
         Vehicle existingVehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle " + vehicleId + " not found"));
+        
 
         // Update vehicle details from VehicleRequest
         if (vehicleRequest.getNumberPlate() != null) {
@@ -142,6 +143,9 @@ public class VehicleService {
 
                 parkingSlot.setVehicle(existingVehicle);
                 parkingSlotRepository.save(parkingSlot);
+
+                existingVehicle.getUser().getId()
+                pushNotificationService.sendParkingSpaceAllocatedNotification(userId, parkingSlot.getSlotNumber());
 
             }
         }
