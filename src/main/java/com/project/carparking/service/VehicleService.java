@@ -144,7 +144,7 @@ public class VehicleService {
                 parkingSlot.setVehicle(existingVehicle);
                 parkingSlotRepository.save(parkingSlot);
 
-                existingVehicle.getUser().getId()
+                Long userId = existingVehicle.getUser().getId();
                 pushNotificationService.sendParkingSpaceAllocatedNotification(userId, parkingSlot.getSlotNumber());
 
             }

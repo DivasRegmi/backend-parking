@@ -29,7 +29,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/auth/**", "/api/img/**").permitAll().
+                    auth.requestMatchers("/api/auth/**", "/api/img/**", "api/images/**").permitAll().
                             requestMatchers("/api/vehicles/number-plates").permitAll().
                             requestMatchers("/api/vehicles/parking-slot-status/**").permitAll().
                             requestMatchers("/api/alert").permitAll().
