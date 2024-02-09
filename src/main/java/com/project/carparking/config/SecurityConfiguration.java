@@ -30,6 +30,10 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/auth/**", "/api/img/**").permitAll().
+                            requestMatchers("/api/vehicles/number-plates").permitAll().
+                            requestMatchers("/api/vehicles/parking-slot-status/**").permitAll().
+                            requestMatchers("/api/alert").permitAll().
+                            requestMatchers("/api/vehicles/number-plates").permitAll().
                             anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -37,6 +41,4 @@ public class SecurityConfiguration {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-
 }

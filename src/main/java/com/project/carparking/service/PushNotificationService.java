@@ -132,9 +132,10 @@ public class PushNotificationService {
         sendNotificationToUser(pushNotification, userId);
     }
 
-    public void sendParkingSpaceAllocatedNotification(Long userId) {
+    public void sendParkingSpaceAllocatedNotification(Long userId, String parkingSlotNumber) {
         String title = NotificationScenario.PARKING_SPACE_ALLOCATED.getTitle();
-        String subtitle = NotificationScenario.PARKING_SPACE_ALLOCATED.getSubtitle();
+        String subtitle = NotificationScenario.PARKING_SPACE_ALLOCATED.getSubtitle() + " Your parking slot number is " + parkingSlotNumber + " Park with ease!";
+
 
         PushNotification pushNotification = new PushNotification();
         pushNotification.setTitle(title);

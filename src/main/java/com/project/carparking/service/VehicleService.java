@@ -36,6 +36,9 @@ public class VehicleService {
     @Autowired
     private VehicleEntryExitStampRepository vehicleEntryExitStampRepository;
 
+    @Autowired
+    private PushNotificationService pushNotificationService;
+
     public WithPaginationResponse<Vehicle> findAll(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<Vehicle> vehiclePage = vehicleRepository.findAll(pageable);
@@ -83,11 +86,16 @@ public class VehicleService {
         vehicle.setUser(user);
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
+        pushNotificationService.sendVehicleAddedNotification(userId);
+
+
         if (vehicle.getParkingSlot() != null) {
             ParkingSlot parkingSlot = vehicle.getParkingSlot();
 
             parkingSlot.setVehicle(savedVehicle);
             parkingSlotRepository.save(parkingSlot);
+
+            pushNotificationService.sendParkingSpaceAllocatedNotification(userId, parkingSlot.getSlotNumber());
 
         }
 
@@ -147,14 +155,19 @@ public class VehicleService {
     //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteVehicle(Long vehicleId) {
         boolean existsById = vehicleRepository.existsById(vehicleId);
+
+
         if (existsById) {
+            Vehicle vehicleById = getVehicleById(vehicleId);
+            Long userId = vehicleById.getUser().getId();
             vehicleRepository.deleteById(vehicleId);
+            pushNotificationService.sendVehicleRemovedNotification(userId);
         } else {
             throw new ResourceNotFoundException("Vehicle " + vehicleId + " not found");
         }
     }
 
-    //11 -> true false
+
     public void updateParkingSlotStatus(String slotNumber, boolean slotStatus) {
         ParkingSlot parkingSlot = parkingSlotRepository.findBySlotNumber(slotNumber).orElseThrow(() -> {
             return new ResourceNotFoundException("Parking Slot " + slotNumber + " not found");
