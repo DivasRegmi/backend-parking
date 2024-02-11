@@ -26,6 +26,13 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.findAll(pageNo, pageSize));
     }
 
+    @GetMapping("/parking-slots-status")
+    public ResponseEntity<List<String>> findAllParkingSlot() {
+
+        return ResponseEntity.ok(vehicleService.findAllParkingSlot());
+    }
+
+
     @GetMapping("/{vehicleId}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(vehicleId));

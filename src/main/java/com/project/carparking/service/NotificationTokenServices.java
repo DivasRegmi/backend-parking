@@ -5,6 +5,7 @@ import com.project.carparking.entity.User;
 import com.project.carparking.exception.ResourceNotFoundException;
 import com.project.carparking.repository.NotificationTokenRepository;
 import com.project.carparking.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,13 @@ public class NotificationTokenServices {
         newToken.setUser(user);
 
         return notificationTokenRepository.save(newToken);
+    }
+
+    @Transactional
+    public void deleteByUserId(Long userId) {
+
+        // Delete entries older than one month
+        notificationTokenRepository.deleteByUserId(userId);
     }
 
 }

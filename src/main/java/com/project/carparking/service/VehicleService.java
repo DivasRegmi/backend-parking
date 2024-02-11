@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,19 @@ public class VehicleService {
         vehicleAndPagination.setPaginationResponse(Converter.convertPageToPageResponse(vehiclePage));
 
         return vehicleAndPagination;
+    }
+
+    public  List<String> findAllParkingSlot() {
+        List<ParkingSlot> parkingSlots = parkingSlotRepository.findAll();
+        List<String> occupiedSlots = new ArrayList<>();
+
+        for (ParkingSlot slot : parkingSlots) {
+            if (slot.isSlotStatus() && slot.getSlotNumber() != null) {
+                occupiedSlots.add(slot.getSlotNumber());
+            }
+        }
+
+        return occupiedSlots;
     }
 
     public Vehicle getVehicleById(Long vehicleId) {

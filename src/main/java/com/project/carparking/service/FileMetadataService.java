@@ -1,5 +1,6 @@
 package com.project.carparking.service;
 
+import com.project.carparking.dto.ImageUrlWithCreationDate;
 import com.project.carparking.entity.FileMetadata;
 import com.project.carparking.repository.FileMetadataRepository;
 import jakarta.transaction.Transactional;
@@ -44,13 +45,18 @@ public class FileMetadataService {
         }
     }
 
-    public List<String> getAllImageUrls() {
+    public List<ImageUrlWithCreationDate> getAllImageUrlsWithCreationDate() {
         List<FileMetadata> files = fileMetadataRepository.findAllByOrderByCreatedAtDesc();
+
         return files.stream()
-                .map(file -> ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/api/images/")
-                        .path(file.getId().toString())
-                        .toUriString())
+                .map(file -> {
+                    String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path("/api/images/")
+                            .path(file.getId().toString())
+                            .toUriString();
+                    LocalDateTime createdAt = file.getCreatedAt();
+                    return new ImageUrlWithCreationDate(imageUrl, createdAt);
+                })
                 .collect(Collectors.toList());
     }
 

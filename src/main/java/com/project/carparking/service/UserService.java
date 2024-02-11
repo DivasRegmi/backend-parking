@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,13 @@ public class UserService {
 
     @Autowired
     private PushNotificationService pushNotificationService;
+
+    @Autowired
+    private NotificationTokenServices notificationTokenServices;
+
+    @Autowired
+    private NotificationService notificationService;
+
 
 
     public WithPaginationResponse<UserResponse> findAll(int pageNo, int pageSize) {
@@ -166,13 +174,20 @@ public class UserService {
 
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @Transactional
     public void deleteUser(Long userId) {
 
-        boolean existsById = userRepository.existsById(userId);
-        if (existsById) {
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            return new ResourceNotFoundException("User " + userId + " not found");
+        });
+
+        if (user.getRole() != EnumRole.ADMIN) {
+            notificationTokenServices.deleteByUserId(userId);
+            notificationService.deleteByUserId(userId);
             userRepository.deleteById(userId);
-        } else {
-            throw new ResourceNotFoundException("User " + userId + " not found");
+        }else {
+            throw  new IllegalArgumentException("Admin cannot be deleted");
+
         }
     }
 

@@ -1,5 +1,6 @@
 package com.project.carparking.controller;
 
+import com.project.carparking.dto.ImageUrlWithCreationDate;
 import com.project.carparking.service.FileMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -23,8 +24,8 @@ public class FileMetadataController {
     }
 
     @GetMapping
-    public ResponseEntity<List<String>> getAllImageMetadata() {
-        List<String> fileUrls = imageService.getAllImageUrls();
+    public ResponseEntity<List<ImageUrlWithCreationDate>> getAllImageMetadata() {
+        List<ImageUrlWithCreationDate> fileUrls = imageService.getAllImageUrlsWithCreationDate();
         return ResponseEntity.ok(fileUrls);
     }
 

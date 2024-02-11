@@ -57,4 +57,11 @@ public class NotificationService {
         // Delete entries older than one month
         notificationRepository.deleteByDateBefore(oneMonthAgo);
     }
+
+    @Transactional
+    public void deleteByUserId(Long userId) {
+
+        // Delete entries older than one month
+        notificationRepository.deleteByUserId(userId);
+    }
 }
