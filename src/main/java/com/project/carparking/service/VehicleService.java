@@ -186,41 +186,43 @@ public class VehicleService {
         }
     }
 
-
     public void updateParkingSlotStatus(String slotNumber, boolean slotStatus) {
-        ParkingSlot parkingSlot = parkingSlotRepository.findBySlotNumber(slotNumber).orElseThrow(() -> {
-            return new ResourceNotFoundException("Parking Slot " + slotNumber + " not found");
-        });
+        ParkingSlot parkingSlot = parkingSlotRepository.findBySlotNumber(slotNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Parking Slot " + slotNumber + " not found"));
 
         parkingSlot.setSlotStatus(slotStatus);
         parkingSlotRepository.save(parkingSlot);
 
         Vehicle vehicle = parkingSlot.getVehicle();
 
-        VehicleEntryExitStamp lastStamp = vehicleEntryExitStampRepository.findFirstByOrderByEntryTimeDesc().orElseThrow(() -> {
-            return new ResourceNotFoundException("VehicleEntryExitStamp not found");
-        });
+        Optional<VehicleEntryExitStamp> lastStamp = vehicleEntryExitStampRepository.findFirstByVehicleIdOrderByEntryTimeDesc(vehicle.getId());
 
-        if (slotStatus && lastStamp.getExitTime() != null) {
-            //11 -> true  after 5 min 11-> true
+        if (slotStatus) {
             LocalDateTime currentTime = LocalDateTime.now();
-            VehicleEntryExitStamp vehicleEntryExitStamp = new VehicleEntryExitStamp();
-            vehicleEntryExitStamp.setCountFalseSlotStatus(0);
-            vehicleEntryExitStamp.setEntryTime(currentTime);
-            vehicleEntryExitStamp.setVehicle(vehicle);
-
-            vehicleEntryExitStampRepository.save(vehicleEntryExitStamp);
-        } else if (!slotStatus && lastStamp.getCountFalseSlotStatus() < 1) {
-            lastStamp.setCountFalseSlotStatus(lastStamp.getCountFalseSlotStatus() + 1);
-            vehicleEntryExitStampRepository.save(lastStamp);
-
-        } else if (!slotStatus && lastStamp.getCountFalseSlotStatus() == 1) {
-            LocalDateTime currentTime = LocalDateTime.now();
-            LocalDateTime fiveMinutesAgo = currentTime.minusMinutes(5);
-            lastStamp.setExitTime(fiveMinutesAgo);
-            lastStamp.setCountFalseSlotStatus(lastStamp.getCountFalseSlotStatus() + 1);
-            vehicleEntryExitStampRepository.save(lastStamp);
+            if (lastStamp.isEmpty() || lastStamp.get().getExitTime() != null) {
+                saveNewEntryStamp(currentTime, vehicle);
+            }
+        } else {
+            if (lastStamp.isPresent()) {
+                VehicleEntryExitStamp stamp = lastStamp.get();
+                if (stamp.getCountFalseSlotStatus() < 1) {
+                    stamp.setCountFalseSlotStatus(stamp.getCountFalseSlotStatus() + 1);
+                    vehicleEntryExitStampRepository.save(stamp);
+                } else if (stamp.getCountFalseSlotStatus() == 1) {
+                    stamp.setExitTime(LocalDateTime.now().minusMinutes(5));
+                    stamp.setCountFalseSlotStatus(stamp.getCountFalseSlotStatus() + 1);
+                    vehicleEntryExitStampRepository.save(stamp);
+                }
+            }
         }
+    }
+
+    private void saveNewEntryStamp(LocalDateTime entryTime, Vehicle vehicle) {
+        VehicleEntryExitStamp vehicleEntryExitStamp = new VehicleEntryExitStamp();
+        vehicleEntryExitStamp.setCountFalseSlotStatus(0);
+        vehicleEntryExitStamp.setEntryTime(entryTime);
+        vehicleEntryExitStamp.setVehicle(vehicle);
+        vehicleEntryExitStampRepository.save(vehicleEntryExitStamp);
     }
 
     public String[] getAllNumberPlates() {

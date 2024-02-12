@@ -13,4 +13,5 @@ public interface VehicleEntryExitStampRepository extends JpaRepository<VehicleEn
     void deleteByEntryTimeBefore(LocalDateTime date);
 
     Optional<VehicleEntryExitStamp> findFirstByOrderByEntryTimeDesc();
+    Optional<VehicleEntryExitStamp> findFirstByVehicleIdOrderByEntryTimeDesc(Long vehicleId);
 }
